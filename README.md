@@ -72,10 +72,13 @@ Sentinel ──→ Analyzer ──→ Strategy & Backtest
 
 ## 🛠️ 功能模块
 
-### 1. 宏观/行业监测 (Sentinel) — 规划中
+### 1. 宏观/行业监测 (Sentinel) — ✅ 已实现
 
-- **宏观因子**: 10Y 国债收益率、M2-M1 剪刀差、PMI 等 20+ 指标，基于规则引擎 + LLM 生成每日宏观简报。
-- **行业脉搏**: 自动跟踪申万 31 个一级行业 ETF 的 PE/PB 历史分位点，生成行业观测报告。
+- **MacroFactorAnalyzer**: 4维度 ~25指标（流动性/增长/通胀/外部），规则引擎 + 综合评分
+- **IndustryAnalyzer**: 申万31个一级行业估值水位/动量/情绪，行业排名与信号
+- **BriefingGenerator**: 每日宏观简报（Markdown格式，80%模板填充，可选LLM润色）
+
+> 完整演示见 [examples/demo_sentinel.ipynb](examples/demo_sentinel.ipynb)（含 mock 数据，无需网络即可运行）
 
 ### 2. 标准化投研 (Analyzer) — ✅ 已实现
 
@@ -83,10 +86,17 @@ Sentinel ──→ Analyzer ──→ Strategy & Backtest
 - **核心指标评分**: ROE 杜邦分解、毛利率趋势、自由现金流覆盖率等 40+ 指标。
 - **投研报告生成**: 生成 Value Line 一页式投研报告（Markdown 格式）。
 
-### 3. 策略与回测 (Strategy & Backtest) — 规划中
+### 3. 策略与回测 (Strategy & Backtest) — ✅ 已实现
 
-- **因子化建模**: 将基本面逻辑（如：低估值 + 业绩反转）封装为可执行策略。
-- **绩效评估**: 自动计算夏普比率、最大回撤、信息比率等指标。
+- **因子库 (factors.py)**: 支持基本面、估值、行业、宏观4类因子，支持LONG/SHORT方向
+- **策略模板 (strategy_templates.py)**: 3个预设策略
+  - `strategy_value_quality()`: 低估值 + 高质量选股
+  - `strategy_reversal()`: 业绩反转策略
+  - `strategy_quality_dividend()`: 质量 + 红利策略
+- **回测引擎 (engine.py)**: 历史回放、调仓逻辑、佣金/滑点、绩效计算
+- **绩效指标 (metrics.py)**: 夏普比率、最大回撤、信息比率、胜率、换手率等
+
+> 完整演示见 [examples/demo_strategy.ipynb](examples/demo_strategy.ipynb)（含 mock 数据，无需网络即可运行）
 
 ## 📊 数据源
 
@@ -111,13 +121,26 @@ fundamental_quant/
 │   │   ├── financial.py          #   FinancialCleaner（三表清洗）
 │   │   ├── metrics.py            #   FinancialMetrics（40+ 指标 + 评分）
 │   │   └── report.py             #   ReportGenerator（Value Line 报告）
-│   ├── sentinel/                 # 宏观/行业监测（📋 骨架）
-│   └── strategy/                 # 策略与回测（📋 骨架）
+│   ├── sentinel/                 # 宏观/行业监测（✅ 已实现）
+│   │   ├── macro.py              #   MacroFactorAnalyzer（4维度 ~25指标）
+│   │   ├── industry.py           #   IndustryAnalyzer（31行业排名）
+│   │   └── briefing.py           #   BriefingGenerator（每日宏观简报）
+│   └── strategy/                 # 策略与回测（✅ 已实现）
+│       ├── factors.py             #   因子库（4类因子 + Direction枚举）
+│       ├── engine.py              #   BacktestEngine（回测引擎）
+│       ├── metrics.py             #   绩效指标（夏普/回撤/信息比率等）
+│       └── strategy_templates.py  #   策略模板（3个预设策略）
 ├── examples/
-│   └── demo_analyzer.ipynb       # Analyzer 完整演示（含输出）
+│   ├── demo_analyzer.ipynb       # Analyzer 完整演示（含输出）
+│   ├── demo_sentinel.ipynb       # Sentinel 完整演示（含输出）
+│   ├── demo_strategy.ipynb       # Strategy 完整演示（含输出）
+│   ├── report_600519_2023.md    # 示例分析报告
+│   └── sentinel_report.md        # 示例宏观简报
 ├── tests/
 │   ├── test_data.py              # 16 项数据层测试
-│   └── test_analyzer.py          # 35 项分析模块测试
+│   ├── test_analyzer.py          # 35 项分析模块测试
+│   ├── test_sentinel.py          # 55 项监测模块测试
+│   └── test_strategy.py          # 39 项策略模块测试
 ├── DESIGN.md                     # 详细设计文档
 └── pyproject.toml
 ```
@@ -131,9 +154,16 @@ fundamental_quant/
 | Phase 1：Analyzer | 三表清洗 + 40+ 指标 + Value Line 报告 | ✅ 完成 |
 | Phase 1：测试 | 51 项单元测试，覆盖率 > 90% | ✅ 完成 |
 | Phase 1：示例 | demo_analyzer.ipynb 全流程演示 | ✅ 完成 |
-| Phase 2 | Sentinel 宏观/行业监测 | 📋 待开发 |
-| Phase 3 | Strategy + Backtest 策略与回测 | 📋 待开发 |
-| Phase 4 | 打磨与文档 | 📋 待开发 |
+| Phase 2：Sentinel | 宏观/行业监测（4维度 ~25指标） | ✅ 完成 |
+| Phase 2：测试 | 55 项监测模块测试 | ✅ 完成 |
+| Phase 2：示例 | demo_sentinel.ipynb 全流程演示 | ✅ 完成 |
+| Phase 3：Strategy | 因子库 + 策略模板 + 回测引擎 | ✅ 完成 |
+| Phase 3：测试 | 39 项策略模块测试 | ✅ 完成 |
+| Phase 3：示例 | demo_strategy.ipynb 全流程演示 | 📋 待创建 |
+| Phase 4：打磨 | 文档更新 + 代码推送 | 🔄 进行中 |
+| Phase 4：GitHub | 推送最新代码到远程仓库 | 📋 待完成 |
+
+**当前进度：Phase 1-3 核心功能已完成（145/145 测试通过）**
 
 ## 📄 License
 
