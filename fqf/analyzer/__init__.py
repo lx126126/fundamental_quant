@@ -1,10 +1,12 @@
-"""标准化投研模块 (Analyzer)
+"""Analyzer 模块 — 标准化投研分析"""
 
-统一个股财务指标评价体系，生成 Value Line 风格的一页投研报告。
-"""
+from fqf.analyzer.financial import FinancialCleaner
+from fqf.analyzer.metrics import FinancialMetrics
+from fqf.analyzer.report import ReportGenerator, generate_report
 
-from fqf.analyzer.financial import FinancialDataLoader
-from fqf.analyzer.metrics import MetricsCalculator
-from fqf.analyzer.report import ValueLineReport
-
-__all__ = ["FinancialDataLoader", "MetricsCalculator", "ValueLineReport"]
+__all__ = [
+    "FinancialCleaner",
+    "FinancialMetrics",
+    "ReportGenerator",
+    "generate_report",
+]

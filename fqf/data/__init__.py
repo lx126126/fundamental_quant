@@ -4,6 +4,7 @@
 """
 
 from fqf.data.fetcher import DataFetcher
+from fqf.data.akshare_fetcher import AKShareFetcher
 from fqf.data.cleaner import DataCleaner
 
-__all__ = ["DataFetcher", "DataCleaner"]
+__all__ = ["DataFetcher", "AKShareFetcher", "DataCleaner"]
